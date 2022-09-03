@@ -1,8 +1,8 @@
 from sqlalchemy.exc import IntegrityError
 from flask import Blueprint, request, abort, jsonify
-from models import User
+from models import User, Librarian
 from main import bcrypt, db
-from schemas import user_schema
+from schemas import user_schema, librarian_schema
 from datetime import timedelta
 from flask_jwt_extended import create_access_token
 
@@ -44,3 +44,17 @@ def auth_register():
     access_token = create_access_token(identity=user.id, expires_delta=expire)
 
     return jsonify({"username": user.username, "access_token": access_token})
+
+
+@auth.route("/librarian/login", methods=["POST"])
+def lib_login():
+    lib_fields = librarian_schema.load(request.json)
+    lib = Librarian.query.filter_by(username=lib_fields["username"]).first()
+
+    if not lib or not bcrypt.check_password_hash(lib.password, lib_fields["password"]):
+        return abort(401, description="Incorrect username or password.")
+
+    expiry = timedelta(days=1)
+    access_token = create_access_token(identity=f"librarian{lib.id}", expires_delta=expiry)
+
+    return jsonify({"username": lib.username, "access_token": access_token})
