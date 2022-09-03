@@ -2,19 +2,10 @@ from flask import Blueprint, request, jsonify, abort
 from main import db
 from models import Book
 from schemas import book_schema, books_schema
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required
+from controllers.auth_util import librarian_only
 
 books = Blueprint("books", __name__, url_prefix="/books")
-
-
-def librarian_only(function):
-    def wrapper(*args, **kwargs):
-        if "lib" in get_jwt_identity():
-            return function(*args, **kwargs)
-        else:
-            return abort(403, description="Unauthorised.")
-
-    return wrapper
 
 
 @books.route("/", methods=["GET"])
@@ -51,6 +42,7 @@ def create_book():
 
 @books.route("/<int:id>", methods=["PUT"])
 @jwt_required()
+@librarian_only
 def update_book(id):
     book = Book.query.get(id)
 
@@ -65,3 +57,5 @@ def update_book(id):
     book.author_id = book_fields.get("author_id", book.author_id)
 
     db.session.commit()
+
+    return jsonify(book_schema.dump(book))
