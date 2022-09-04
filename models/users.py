@@ -8,3 +8,4 @@ class User(db.Model):
     username = db.Column(db.String(), nullable=False, unique=True)
     email = db.Column(db.String(), nullable=False, unique=True)
     password = db.Column(db.String(), nullable=False)
+    reservations = db.relationship("Reservation", backref="user", cascade="all, delete")

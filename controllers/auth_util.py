@@ -3,6 +3,11 @@ from flask import abort
 
 
 def librarian_only(func):
+    """
+    Decorator function for authentication purposes - librarian
+    :param func:
+    :return: wrapper function
+    """
     def wrapper(*args, **kwargs):
         if "lib" in get_jwt_identity():
             return func(*args, **kwargs)

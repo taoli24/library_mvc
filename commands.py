@@ -1,6 +1,6 @@
 from main import db, bcrypt
 from flask import Blueprint
-from models import Author, Book, User, Librarian
+from models import Author, Book, User, Librarian, Reservation
 from datetime import date
 
 db_commands = Blueprint("db", __name__)
@@ -41,7 +41,7 @@ def seed_db():
         genre="Children",
         year=2022,
         length=4,
-        author_id=1
+        author_id=author1.id
     )
 
     book2 = Book(
@@ -49,7 +49,7 @@ def seed_db():
         genre="Classic",
         year=1725,
         length=3,
-        author_id=1
+        author_id=author1.id
     )
 
     book3 = Book(
@@ -57,7 +57,7 @@ def seed_db():
         genre="Children",
         year=1975,
         length=1,
-        author_id=2
+        author=author2
     )
 
     book4 = Book(
@@ -65,7 +65,7 @@ def seed_db():
         genre="Modern",
         year=2010,
         length=3,
-        author_id=2
+        author=author2
     )
 
     db.session.add(book1)
@@ -92,4 +92,14 @@ def seed_db():
     db.session.add(librarian1)
     db.session.commit()
 
+    # create reservation
+    reservation1 = Reservation(
+        start=date(2022, 9, 10),
+        length=4,
+        book=book1,
+        user=user1
+    )
+
+    db.session.add(reservation1)
+    db.session.commit()
     print("Tables seeded")

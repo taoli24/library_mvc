@@ -6,8 +6,10 @@ class BookSchema(ma.Schema):
     class Meta:
         ordered = True
         # fields to expose
-        fields = ("id", "title", "genre", "length", "year", "author")
-    author = fields.Nested("AuthorSchema")
+        fields = ("id", "title", "genre", "length", "year", "author_id", "author")
+        load_only = ("author_id",)
+
+    author = fields.Nested("AuthorSchema", only=("name", "country"))
 
 
 # single book schema
